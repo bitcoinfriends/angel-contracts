@@ -1,7 +1,7 @@
 {
-  "name": "",
+  "name": "angel-contracts",
   "version": "0.0.1",
-  "description": "",
+  "description": "Angel smart contracts",
   "main": "truffle.js",
   "scripts": {
     "test": "scripts/test.sh",
@@ -24,6 +24,7 @@
   "author": "",
   "license": "MIT",
   "keywords": [
+    "angel",
     "solidity",
     "ethereum",
     "smart",

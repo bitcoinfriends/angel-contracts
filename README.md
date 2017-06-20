@@ -1,2 +1,2 @@
-Template for the repo with Ethereum smart contracts
+Ethereum smart contracts for Angel project
 
