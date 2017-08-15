@@ -115,6 +115,13 @@ contract CentralBank {
     secondRefundRoundFinishTimestamp = firstRefundRoundFinishTimestamp + _secondRefundRoundDuration;
   }
 
+  function setTokenPrice(uint _initialTokenPrice) {
+    require(now < icoLaunchTimestamp);
+    require(msg.sender == angelFoundationAddress || msg.sender == angelAdminAddress);
+
+    initialTokenPrice = _initialTokenPrice;
+  }
+
   function setFoundationAddress(address _newFoundationAddress) {
     require(_newFoundationAddress != address(0x0));
     require(msg.sender == angelFoundationAddress);
