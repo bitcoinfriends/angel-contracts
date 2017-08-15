@@ -24,7 +24,7 @@ contract AngelToken is StandardToken, NamedToken, Pausable {
   /* Storage */
 
   address public centralBankAddress;
-  mapping (address => bool) spendingBlocked;
+  mapping (address => uint) spendingBlocksNumber;
 
 
   /* Constructor */
@@ -40,7 +40,7 @@ contract AngelToken is StandardToken, NamedToken, Pausable {
     if (_to != centralBankAddress) {
       require(!paused);
     }
-    require(spendingBlocked[msg.sender] == false);
+    require(spendingBlocksNumber[msg.sender] == 0);
 
     bool result = super.transfer(_to, _value);
     if (result == true && _to == centralBankAddress) {
@@ -54,7 +54,7 @@ contract AngelToken is StandardToken, NamedToken, Pausable {
   }
 
   function transferFrom(address _from, address _to, uint _value) whenContractNotPaused returns (bool){
-    require(spendingBlocked[_from] == false);
+    require(spendingBlocksNumber[_from] == 0);
 
     bool result = super.transferFrom(_from, _to, _value);
     if (result == true && _to == centralBankAddress) {
@@ -77,17 +77,12 @@ contract AngelToken is StandardToken, NamedToken, Pausable {
   }
 
   function blockSpending(address _account) onlyAllowedManager('block_spending') {
-    spendingBlocked[_account] = true;
+    spendingBlocksNumber[_account] = spendingBlocksNumber[_account].add(1);
     SpendingBlockedEvent(_account);
   }
 
   function unblockSpending(address _account) onlyAllowedManager('unblock_spending') {
-    spendingBlocked[_account] = false;
+    spendingBlocksNumber[_account] = spendingBlocksNumber[_account].sub(1);
     SpendingUnblockedEvent(_account);
-  }
-
-  modifier whenAccountNotBlocked(address _account) {
-    require(spendingBlocked[_account] == false);
-    _;
   }
 }
