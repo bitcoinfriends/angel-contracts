@@ -75,7 +75,7 @@ contract CentralBank {
   function CentralBank() {
     angelAdminAddress = msg.sender;
 
-    icoLaunchTimestamp = now;
+    icoLaunchTimestamp = now + 1 days;
     icoFinishTimestamp = icoLaunchTimestamp + 30 days;
     firstRefundRoundFinishTimestamp = icoFinishTimestamp + 100 days;
     secondRefundRoundFinishTimestamp = firstRefundRoundFinishTimestamp + 100 days;
@@ -95,17 +95,9 @@ contract CentralBank {
     uint _firstRefundRoundDuration,
     uint _secondRefundRoundDuration
   ) {
+    require(now < icoLaunchTimestamp);
+    require(msg.sender == angelFoundationAddress || msg.sender == angelAdminAddress);
     require(_newFoundationAddress != address(0x0));
-
-    if (isICOConfigured == true) {
-      require(now < icoLaunchTimestamp);
-    }
-
-    if (isICOConfigured == true) {
-      require(msg.sender == angelFoundationAddress);
-    } else {
-      require(msg.sender == angelFoundationAddress || msg.sender == angelAdminAddress);
-    }
 
     isICOConfigured = true;
     angelFoundationAddress = _newFoundationAddress;
