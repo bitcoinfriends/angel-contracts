@@ -79,7 +79,7 @@ global.contract('CentralBank', (accounts) => {
     const centralBankInstance = await CentralBank.deployed();
 
     await verifyContractConfig(centralBankInstance,
-                               '0x0000000000000000000000000000000000000123',
+                               '0xf488ecd0120b75b97378e4941eb6b3c8ec49d748',
                                1504224000,
                                2592000,
                                8640000,
@@ -204,7 +204,7 @@ global.contract('CentralBank', (accounts) => {
 
     // first investment
     await global.web3.eth.sendTransaction(
-      { from: investor01, to: tempCentralBankInstance.address, value: 5 * (10 ** 16), gas: 200000 });
+      { from: investor01, to: tempCentralBankInstance.address, value: 5 * (10 ** 16), gas: 250000 });
     investor01Balance = await tempTokenInstance.balanceOf.call(investor01);
     global.assert.equal(investor01Balance.toNumber(), 500 * (10 ** 18));
     totalSupply = await tempTokenInstance.totalSupply.call();
@@ -216,7 +216,7 @@ global.contract('CentralBank', (accounts) => {
 
     // second investment
     await global.web3.eth.sendTransaction(
-      { from: investor01, to: tempCentralBankInstance.address, value: 10 * (10 ** 18), gas: 200000 });
+      { from: investor01, to: tempCentralBankInstance.address, value: 10 * (10 ** 18), gas: 250000 });
     investor01Balance = await tempTokenInstance.balanceOf.call(investor01);
     global.assert.equal(investor01Balance.toNumber(), 100500 * (10 ** 18));
     totalSupply = await tempTokenInstance.totalSupply.call();
@@ -243,7 +243,7 @@ global.contract('CentralBank', (accounts) => {
 
     // first investment
     await global.web3.eth.sendTransaction(
-      { from: investor01, to: tempCentralBankInstance.address, value: 31150 * (10 ** 18), gas: 400000 });
+      { from: investor01, to: tempCentralBankInstance.address, value: 31150 * (10 ** 18), gas: 450000 });
     investor01Balance = await tempTokenInstance.balanceOf.call(investor01);
     global.assert.equal(investor01Balance.toNumber(), 70000000 * (10 ** 18));
     totalSupply = await tempTokenInstance.totalSupply.call();
@@ -257,7 +257,7 @@ global.contract('CentralBank', (accounts) => {
     let isCaught = false;
     try {
       await global.web3.eth.sendTransaction(
-        { from: investor01, to: tempCentralBankInstance.address, value: 1 * (10 ** 14), gas: 200000 });
+        { from: investor01, to: tempCentralBankInstance.address, value: 1 * (10 ** 14), gas: 250000 });
     } catch (err) {
       if (err.message.includes('is not a function')) { throw err; }
       isCaught = true;
@@ -332,7 +332,7 @@ global.contract('CentralBank', (accounts) => {
 
     // first investment
     await global.web3.eth.sendTransaction(
-      { from: investor02, to: tempCentralBankInstance.address, value: 10 * (10 ** 18), gas: 200000 });
+      { from: investor02, to: tempCentralBankInstance.address, value: 10 * (10 ** 18), gas: 250000 });
     investor02Balance = await tempTokenInstance.balanceOf.call(investor02);
     global.assert.equal(investor02Balance.toNumber(), 100000 * (10 ** 18));
     totalSupply = await tempTokenInstance.totalSupply.call();
@@ -344,7 +344,7 @@ global.contract('CentralBank', (accounts) => {
 
     // second investment
     await global.web3.eth.sendTransaction(
-      { from: investor02, to: tempCentralBankInstance.address, value: 200 * (10 ** 18), gas: 200000 });
+      { from: investor02, to: tempCentralBankInstance.address, value: 200 * (10 ** 18), gas: 250000 });
     investor02Balance = await tempTokenInstance.balanceOf.call(investor02);
     global.assert.equal(investor02Balance.toNumber(), 2000000 * (10 ** 18));
     totalSupply = await tempTokenInstance.totalSupply.call();
@@ -438,12 +438,12 @@ global.contract('CentralBank', (accounts) => {
     global.assert.equal(investor01Balance.toNumber(), 0);
     let totalSupply = await tempTokenInstance.totalSupply.call();
     global.assert.equal(totalSupply.toNumber(), 0);
-    let isPaused = await tempTokenInstance.paused.call();
+    let isPaused = await tempTokenInstance.getPaused.call();
     global.assert.equal(isPaused, true);
 
     // first investment
     await global.web3.eth.sendTransaction(
-      { from: investor01, to: tempCentralBankInstance.address, value: 7 * (10 ** 16), gas: 200000 });
+      { from: investor01, to: tempCentralBankInstance.address, value: 7 * (10 ** 16), gas: 250000 });
     investor01Balance = await tempTokenInstance.balanceOf.call(investor01);
     global.assert.equal(investor01Balance.toNumber(), 700 * (10 ** 18));
     totalSupply = await tempTokenInstance.totalSupply.call();
@@ -462,7 +462,7 @@ global.contract('CentralBank', (accounts) => {
     // test angel token
     const foundationBalance = await tempTokenInstance.balanceOf.call(foundation);
     global.assert.equal(foundationBalance.toNumber(), 300 * (10 ** 18));
-    isPaused = await tempTokenInstance.paused.call();
+    isPaused = await tempTokenInstance.getPaused.call();
     global.assert.equal(isPaused, false);
   });
 
@@ -479,13 +479,13 @@ global.contract('CentralBank', (accounts) => {
 
     // first investment
     await global.web3.eth.sendTransaction(
-      { from: investor01, to: tempCentralBankInstance.address, value: 5 * (10 ** 16), gas: 200000 });
+      { from: investor01, to: tempCentralBankInstance.address, value: 5 * (10 ** 16), gas: 250000 });
     let foundationBalance = global.web3.eth.getBalance(foundation);
     global.assert.equal(foundationBalance.toNumber(), foundationInitialBalance.toNumber() + (1 * (10 ** 16)));
 
     // second investment
     await global.web3.eth.sendTransaction(
-      { from: investor01, to: tempCentralBankInstance.address, value: 10 * (10 ** 18), gas: 200000 });
+      { from: investor01, to: tempCentralBankInstance.address, value: 10 * (10 ** 18), gas: 250000 });
     foundationBalance = global.web3.eth.getBalance(foundation);
     global.assert.closeTo(foundationBalance.toNumber(),
                           foundationInitialBalance.toNumber() + (201 * (10 ** 16)),

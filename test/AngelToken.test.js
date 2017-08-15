@@ -2,9 +2,7 @@ const AngelToken = global.artifacts.require('AngelToken.sol');
 const CentralBank = global.artifacts.require('CentralBank.sol');
 
 
-global.contract('AngelToken', (accounts) => {
-  const owner = accounts[0];
-
+global.contract('AngelToken', () => {
   global.it('should check initial minting of the token', async () => {
     const centralBankInstance = await CentralBank.deployed();
     const tokenAddress = await centralBankInstance.angelToken.call();
@@ -34,7 +32,7 @@ global.contract('AngelToken', (accounts) => {
     const tokenAddress = await centralBankInstance.angelToken.call();
     const tokenInstance = await AngelToken.at(tokenAddress);
 
-    const paused = await tokenInstance.paused.call();
+    const paused = await tokenInstance.getPaused.call();
     global.assert.equal(paused, true);
   });
 });

@@ -1,7 +1,7 @@
 const CentralBank = artifacts.require('CentralBank.sol');
 
 
-const angelFoundationAddress    = '0x123';  // todo set correct address
+const angelFoundationAddress    = '0xF488ecd0120B75b97378e4941Eb6B3c8ec49d748';  // todo set correct address
 const icoLaunchTimestamp        = 1504224000;
 const icoDuration               = 2592000;
 const firstRefundRoundDuration  = 8640000;

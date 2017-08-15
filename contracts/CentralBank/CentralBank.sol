@@ -32,10 +32,6 @@ contract CentralBank {
   uint public landmarkSize = 1000000 * (10 ** 18);
   uint public landmarkPriceStep = 1 * (10 ** 18) / (10 ** 5);
 
-  uint public icoDuration = 30 days;
-  uint public firstRefundRoundDuration = 100 days;
-  uint public secondRefundRoundDuration = 100 days;
-
   uint public firstRefundRoundRateNumerator = 80;
   uint public firstRefundRoundRateDenominator = 100;
   uint public secondRefundRoundRateNumerator = 40;
@@ -80,12 +76,16 @@ contract CentralBank {
     angelAdminAddress = msg.sender;
 
     icoLaunchTimestamp = now;
-    icoFinishTimestamp = icoLaunchTimestamp + icoDuration;
-    firstRefundRoundFinishTimestamp = icoFinishTimestamp + firstRefundRoundDuration;
-    secondRefundRoundFinishTimestamp = firstRefundRoundFinishTimestamp + secondRefundRoundDuration;
+    icoFinishTimestamp = icoLaunchTimestamp + 30 days;
+    firstRefundRoundFinishTimestamp = icoFinishTimestamp + 100 days;
+    secondRefundRoundFinishTimestamp = firstRefundRoundFinishTimestamp + 100 days;
 
     angelToken = new AngelToken();
-    angelToken.pause();
+    angelToken.enableManager(address(this));
+    angelToken.grantManagerPermission(address(this), 'mint_tokens');
+    angelToken.grantManagerPermission(address(this), 'burn_tokens');
+    angelToken.grantManagerPermission(address(this), 'unpause_contract');
+    angelToken.transferOwnership(angelAdminAddress);
   }
 
   function setICOConfig(
@@ -389,7 +389,7 @@ contract CentralBank {
 
     angelTokenUnpaused = true;
 
-    angelToken.unpause();
+    angelToken.unpauseContract();
   }
 
   function withdrawFoundationFunds() {
