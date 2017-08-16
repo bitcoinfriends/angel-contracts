@@ -21,7 +21,7 @@ global.contract('AngelToken', () => {
     global.assert.equal(name, 'Angel Token');
 
     const symbol = await tokenInstance.symbol.call();
-    global.assert.equal(symbol, 'ANT');
+    global.assert.equal(symbol, 'ANGEL');
 
     const decimals = await tokenInstance.decimals.call();
     global.assert.equal(decimals, 18);
