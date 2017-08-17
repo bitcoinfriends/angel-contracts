@@ -183,58 +183,66 @@ global.contract('CentralBank', (accounts) => {
     let purchasedTokens;
 
     purchasedTokens = await centralBankInstance.calculatePurchasedTokens.call(0, 5 * (10 ** 16));
-    global.assert.equal(purchasedTokens.toNumber(), 500 * (10 ** 18));
+    global.assert.equal(purchasedTokens[0].toNumber(), 500 * (10 ** 18));
+    global.assert.equal(purchasedTokens[1].toNumber(), 0);
 
     purchasedTokens = await centralBankInstance.calculatePurchasedTokens.call(0, 1 * (10 ** 18));
-    global.assert.equal(purchasedTokens.toNumber(), 10000 * (10 ** 18));
+    global.assert.equal(purchasedTokens[0].toNumber(), 10000 * (10 ** 18));
+    global.assert.equal(purchasedTokens[1].toNumber(), 0);
 
     purchasedTokens = await centralBankInstance.calculatePurchasedTokens.call(0, 10 * (10 ** 18));
-    global.assert.equal(purchasedTokens.toNumber(), 100000 * (10 ** 18));
+    global.assert.equal(purchasedTokens[0].toNumber(), 100000 * (10 ** 18));
+    global.assert.equal(purchasedTokens[1].toNumber(), 0);
 
     purchasedTokens = await centralBankInstance.calculatePurchasedTokens.call(0, 50 * (10 ** 18));
-    global.assert.equal(purchasedTokens.toNumber(), 500000 * (10 ** 18));
+    global.assert.equal(purchasedTokens[0].toNumber(), 500000 * (10 ** 18));
+    global.assert.equal(purchasedTokens[1].toNumber(), 0);
 
     purchasedTokens = await centralBankInstance.calculatePurchasedTokens.call(0, 100 * (10 ** 18));
-    global.assert.equal(purchasedTokens.toNumber(), 1000000 * (10 ** 18));
+    global.assert.equal(purchasedTokens[0].toNumber(), 1000000 * (10 ** 18));
+    global.assert.equal(purchasedTokens[1].toNumber(), 0);
 
     purchasedTokens = await centralBankInstance.calculatePurchasedTokens.call(500000 * (10 ** 18), 30 * (10 ** 18));
-    global.assert.equal(purchasedTokens.toNumber(), 300000 * (10 ** 18));
+    global.assert.equal(purchasedTokens[0].toNumber(), 300000 * (10 ** 18));
+    global.assert.equal(purchasedTokens[1].toNumber(), 0);
 
     purchasedTokens = await centralBankInstance.calculatePurchasedTokens.call(0, 155 * (10 ** 18));
-    global.assert.equal(purchasedTokens.toNumber(), 1500000 * (10 ** 18));
+    global.assert.equal(purchasedTokens[0].toNumber(), 1500000 * (10 ** 18));
+    global.assert.equal(purchasedTokens[1].toNumber(), 0);
 
     purchasedTokens = await centralBankInstance.calculatePurchasedTokens.call(500000 * (10 ** 18), 105 * (10 ** 18));
-    global.assert.equal(purchasedTokens.toNumber(), 1000000 * (10 ** 18));
+    global.assert.equal(purchasedTokens[0].toNumber(), 1000000 * (10 ** 18));
+    global.assert.equal(purchasedTokens[1].toNumber(), 0);
 
     purchasedTokens = await centralBankInstance.calculatePurchasedTokens.call(0, 300 * (10 ** 18));
-    global.assert.equal(purchasedTokens.toNumber(), 2750000 * (10 ** 18));
+    global.assert.equal(purchasedTokens[0].toNumber(), 2750000 * (10 ** 18));
+    global.assert.equal(purchasedTokens[1].toNumber(), 0);
 
     purchasedTokens = await centralBankInstance.calculatePurchasedTokens.call(0, 675 * (10 ** 18));
-    global.assert.equal(purchasedTokens.toNumber(), 5500000 * (10 ** 18));
+    global.assert.equal(purchasedTokens[0].toNumber(), 5500000 * (10 ** 18));
+    global.assert.equal(purchasedTokens[1].toNumber(), 0);
 
     purchasedTokens = await centralBankInstance.calculatePurchasedTokens.call(500000 * (10 ** 18), 625 * (10 ** 18));
-    global.assert.equal(purchasedTokens.toNumber(), 5000000 * (10 ** 18));
+    global.assert.equal(purchasedTokens[0].toNumber(), 5000000 * (10 ** 18));
+    global.assert.equal(purchasedTokens[1].toNumber(), 0);
 
     purchasedTokens = await centralBankInstance.calculatePurchasedTokens.call(1500000 * (10 ** 18), 520 * (10 ** 18));
-    global.assert.equal(purchasedTokens.toNumber(), 4000000 * (10 ** 18));
+    global.assert.equal(purchasedTokens[0].toNumber(), 4000000 * (10 ** 18));
+    global.assert.equal(purchasedTokens[1].toNumber(), 0);
 
     purchasedTokens = await centralBankInstance.calculatePurchasedTokens.call(0, 31150 * (10 ** 18));
-    global.assert.equal(purchasedTokens.toNumber(), 70000000 * (10 ** 18));
+    global.assert.equal(purchasedTokens[0].toNumber(), 70000000 * (10 ** 18));
+    global.assert.equal(purchasedTokens[1].toNumber(), 0);
 
     // global.console.log(new Date().getTime());
   });
 
-  global.it('should test that calculation of purchased tokens throws above the investments cap', async () => {
+  global.it('should test that calculation of purchased tokens processes investments cap correctly', async () => {
     // global.console.log(new Date().getTime());
 
-    let isCaught = false;
-    try {
-      await centralBankInstance.calculatePurchasedTokens.call(69999999 * (10 ** 18), 1 * (10 ** 15));
-    } catch (err) {
-      if (err.message.includes('is not a function')) { throw err; }
-      isCaught = true;
-    }
-    global.assert.equal(isCaught, true);
+    const purchasedTokens = await centralBankInstance.calculatePurchasedTokens.call(69999999 * (10 ** 18), 1 * (10 ** 18));
+    global.assert.equal(purchasedTokens[0].toNumber(), 1 * (10 ** 18));
+    global.assert.equal(purchasedTokens[1].toNumber(), 999210000000000000);
 
     // global.console.log(new Date().getTime());
   });

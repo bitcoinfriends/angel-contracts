@@ -101,7 +101,9 @@ contract CentralBank {
     require(now >= icoLaunchTimestamp && now < icoFinishTimestamp);
 
     // calculate amount of tokens for received ETH
-    var _purchasedTokensWei = calculatePurchasedTokens(totalTokensSold, msg.value);
+    uint _purchasedTokensWei = 0;
+    uint _notProcessedEthWei = 0;
+    (_purchasedTokensWei, _notProcessedEthWei) = calculatePurchasedTokens(totalTokensSold, msg.value);
 
     // create record for the investment
     uint _newRecordIndex = investments[msg.sender].length;
@@ -118,6 +120,9 @@ contract CentralBank {
     angelToken.mint(angelFoundationAddress,
                     _purchasedTokensWei * angelFoundationShareNumerator / (angelFoundationShareDenominator - angelFoundationShareNumerator));
     angelFoundationAddress.transfer(msg.value * initialFundsReleaseNumerator / initialFundsReleaseDenominator);
+    if (_notProcessedEthWei > 0) {
+      msg.sender.transfer(_notProcessedEthWei);
+    }
 
     // finish ICO if cap reached
     if (totalTokensSold >= icoCap) {
@@ -140,18 +145,23 @@ contract CentralBank {
   function calculatePurchasedTokens(
     uint _totalTokensSoldBefore,
     uint _investedEthWei)
-    constant returns (uint)
+    constant returns (uint _purchasedTokensWei, uint _notProcessedEthWei)
   {
-    uint _purchasedTokensWei = 0;
-    uint _notProcessedEthWei = _investedEthWei;
+    _purchasedTokensWei = 0;
+    _notProcessedEthWei = _investedEthWei;
 
     uint _landmarkPrice;
     uint _maxLandmarkTokensWei;
     uint _maxLandmarkEthWei;
+    bool _isCapReached = false;
     do {
       // get landmark values
       _landmarkPrice = calculateLandmarkPrice(_totalTokensSoldBefore + _purchasedTokensWei);
       _maxLandmarkTokensWei = landmarkSize - ((_totalTokensSoldBefore + _purchasedTokensWei) % landmarkSize);
+      if (_totalTokensSoldBefore + _purchasedTokensWei + _maxLandmarkTokensWei > icoCap) {
+        _maxLandmarkTokensWei = icoCap - _totalTokensSoldBefore - _purchasedTokensWei;
+        _isCapReached = true;
+      }
       _maxLandmarkEthWei = _maxLandmarkTokensWei * _landmarkPrice / (10 ** 18);
 
       // check investment against landmark values
@@ -164,14 +174,11 @@ contract CentralBank {
         _notProcessedEthWei = 0;
       }
     }
-    while (_notProcessedEthWei > 0);
+    while ((_notProcessedEthWei > 0) && (_isCapReached == false));
 
     require(_purchasedTokensWei > 0);
-    require(_totalTokensSoldBefore + _purchasedTokensWei <= icoCap);
-    // todo return remaining ETH
 
-
-    return _purchasedTokensWei;
+    return (_purchasedTokensWei, _notProcessedEthWei);
   }
 
 
