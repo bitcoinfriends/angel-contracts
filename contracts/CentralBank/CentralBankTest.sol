@@ -55,4 +55,10 @@ contract CentralBankTest is CentralBank {
            investments[_investor][_recordIndex].refundedEthWei == _refundedEthWei &&
            investments[_investor][_recordIndex].returnedTokensWei == _returnedTokensWei;
   }
+
+
+  function selfDestruct() {
+    require(msg.sender == angelFoundationAddress || msg.sender == angelAdminAddress);
+    selfdestruct(angelAdminAddress);
+  }
 }
