@@ -130,6 +130,8 @@ contract CentralBank {
       icoFinishTimestamp = now;
       firstRefundRoundFinishTimestamp -= diff;
       secondRefundRoundFinishTimestamp -= diff;
+
+      unpauseAngelToken();
     }
 
     // fire event
@@ -341,18 +343,8 @@ contract CentralBank {
 
   /* Lifecycle */
 
-  function finishICO() {
-    require(totalTokensSold >= icoCap);
-    require(icoFinishTimestamp > now);
-
-    uint diff = icoFinishTimestamp - now;
-    icoFinishTimestamp = now;
-    firstRefundRoundFinishTimestamp -= diff;
-    secondRefundRoundFinishTimestamp -= diff;
-  }
-
   function unpauseAngelToken() {
-    require(now > icoFinishTimestamp);
+    require(now >= icoFinishTimestamp);
     require(angelTokenUnpaused == false);
 
     angelTokenUnpaused = true;
