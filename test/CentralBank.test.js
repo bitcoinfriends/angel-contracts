@@ -124,6 +124,60 @@ global.contract('CentralBank', (accounts) => {
     // global.console.log(new Date().getTime());
   });
 
+  global.it('should test price ladder for smaller initial price', async () => {
+    // global.console.log(new Date().getTime());
+
+    const tempIcoLaunchTimestamp = Math.round(new Date().getTime() / 1000) - 3;
+
+    tempCentralBankInstance = await CentralBank.new({ from: admin });
+    await tempCentralBankInstance.setTokenPrice.sendTransaction(10 ** 10, { from: admin });
+    await tempCentralBankInstance.setICOConfig.sendTransaction(foundation,
+                                                               tempIcoLaunchTimestamp,
+                                                               tempIcoDuration,
+                                                               tempFirstRefundRoundDuration,
+                                                               tempSecondRefundRoundDuration,
+                                                               { from: admin });
+
+    const tokenAddress = await tempCentralBankInstance.angelToken.call();
+    tempTokenInstance  = await AngelToken.at(tokenAddress); // eslint-disable-line no-multi-spaces
+
+    await verifyContractConfig(tempCentralBankInstance,
+                               foundation,
+                               tempIcoLaunchTimestamp,
+                               tempIcoDuration,
+                               tempFirstRefundRoundDuration,
+                               tempSecondRefundRoundDuration);
+
+    let milestonePrice = await tempCentralBankInstance.calculateLandmarkPrice.call(0);
+    global.assert.equal(milestonePrice.toNumber(), 1 * (10 ** 10));
+
+    milestonePrice = await tempCentralBankInstance.calculateLandmarkPrice.call(5000 * (10 ** 18));
+    global.assert.equal(milestonePrice.toNumber(), 1 * (10 ** 10));
+
+    milestonePrice = await tempCentralBankInstance.calculateLandmarkPrice.call(100000 * (10 ** 18));
+    global.assert.equal(milestonePrice.toNumber(), 1 * (10 ** 10));
+
+    milestonePrice = await tempCentralBankInstance.calculateLandmarkPrice.call(1000000 * (10 ** 18));
+    global.assert.equal(milestonePrice.toNumber(), 11 * (10 ** 9));
+
+    milestonePrice = await tempCentralBankInstance.calculateLandmarkPrice.call(1999999 * (10 ** 18));
+    global.assert.equal(milestonePrice.toNumber(), 11 * (10 ** 9));
+
+    milestonePrice = await tempCentralBankInstance.calculateLandmarkPrice.call(2000000 * (10 ** 18));
+    global.assert.equal(milestonePrice.toNumber(), 12 * (10 ** 9));
+
+    milestonePrice = await tempCentralBankInstance.calculateLandmarkPrice.call(9700000 * (10 ** 18));
+    global.assert.equal(milestonePrice.toNumber(), 19 * (10 ** 9));
+
+    milestonePrice = await tempCentralBankInstance.calculateLandmarkPrice.call(15000000 * (10 ** 18));
+    global.assert.equal(milestonePrice.toNumber(), 25 * (10 ** 9));
+
+    milestonePrice = await tempCentralBankInstance.calculateLandmarkPrice.call(69999999 * (10 ** 18));
+    global.assert.equal(milestonePrice.toNumber(), 79 * (10 ** 9));
+
+    // global.console.log(new Date().getTime());
+  });
+
 
   /* Test investments */
 
@@ -510,6 +564,112 @@ global.contract('CentralBank', (accounts) => {
     global.assert.closeTo(foundationBalance.toNumber(),
                           foundationInitialBalance.toNumber() + (1005 * (10 ** 16)),
                           1 * (10 ** 14));
+
+    // global.console.log(new Date().getTime());
+  });
+
+  global.it('should repeat live test scenario', async () => {
+    // global.console.log(new Date().getTime());
+
+    // check initial state
+    const investor02ETHBalance = await global.web3.eth.getBalance(investor02);
+    global.assert.isAbove(investor02ETHBalance.toNumber(), 205 * (10 ** 18));
+    let investor02Balance = await tempTokenInstance.balanceOf.call(investor02);
+    global.assert.equal(investor02Balance.toNumber(), 0);
+    let totalSupply = await tempTokenInstance.totalSupply.call();
+    global.assert.equal(totalSupply.toNumber(), 0);
+
+    // first investment
+    await global.web3.eth.sendTransaction(
+      { from: investor02, to: tempCentralBankInstance.address, value: 10 * (10 ** 18), gas: 250000 });
+    investor02Balance = await tempTokenInstance.balanceOf.call(investor02);
+    global.assert.equal(investor02Balance.toNumber(), 100000 * (10 ** 18));
+    totalSupply = await tempTokenInstance.totalSupply.call();
+    global.assert.closeTo(totalSupply.toNumber(), 142857 * (10 ** 18), 1 * (10 ** 18));
+
+    let isValidRecord = await tempCentralBankInstance.validateInvestmentRecord
+      .call(investor02, 0, 0, 10 * (10 ** 18), 100000 * (10 ** 18), 0, 0);
+    global.assert.equal(isValidRecord, true);
+
+    // second investment
+    await global.web3.eth.sendTransaction(
+      { from: investor02, to: tempCentralBankInstance.address, value: 200 * (10 ** 18), gas: 250000 });
+    investor02Balance = await tempTokenInstance.balanceOf.call(investor02);
+    global.assert.equal(investor02Balance.toNumber(), 2000000 * (10 ** 18));
+    totalSupply = await tempTokenInstance.totalSupply.call();
+    global.assert.closeTo(totalSupply.toNumber(), 2857142 * (10 ** 18), 1 * (10 ** 18));
+
+    isValidRecord = await tempCentralBankInstance.validateInvestmentRecord
+      .call(investor02, 0, 0, 10 * (10 ** 18), 100000 * (10 ** 18), 0, 0);
+    global.assert.equal(isValidRecord, true);
+    isValidRecord = await tempCentralBankInstance.validateInvestmentRecord
+      .call(investor02, 1, 100000 * (10 ** 18), 200 * (10 ** 18), 1900000 * (10 ** 18), 0, 0);
+    global.assert.equal(isValidRecord, true);
+
+    // first refund
+    let investorBalanceBefore = await global.web3.eth.getBalance(investor02);
+    await tempTokenInstance.transfer.sendTransaction(tempCentralBankInstance.address, 200000 * (10 ** 18),
+                                                     { from: investor02 });
+    investor02Balance = await tempTokenInstance.balanceOf.call(investor02);
+    global.assert.equal(investor02Balance.toNumber(), 1800000 * (10 ** 18));
+    totalSupply = await tempTokenInstance.totalSupply.call();
+    global.assert.closeTo(totalSupply.toNumber(), 2657142 * (10 ** 18), 1 * (10 ** 18));
+    let investorBalanceAfter = await global.web3.eth.getBalance(investor02);
+    global.assert(investorBalanceAfter - investorBalanceBefore, 17.6 * (10 ** 18));
+
+    isValidRecord = await tempCentralBankInstance.validateInvestmentRecord
+      .call(investor02, 0, 0, 10 * (10 ** 18), 100000 * (10 ** 18), 0, 0);
+    global.assert.equal(isValidRecord, true);
+    isValidRecord = await tempCentralBankInstance.validateInvestmentRecord
+      .call(investor02, 1, 100000 * (10 ** 18), 200 * (10 ** 18), 1900000 * (10 ** 18),
+            22 * (10 ** 18), 200000 * (10 ** 18));
+    global.assert.equal(isValidRecord, true);
+
+    // sleep
+    await new Promise((resolve) => setTimeout(resolve, tempIcoDuration * 1000));
+
+    // second refund
+    investorBalanceBefore = await global.web3.eth.getBalance(investor02);
+    await tempTokenInstance.transfer.sendTransaction(tempCentralBankInstance.address, 1750000 * (10 ** 18),
+                                                     { from: investor02 });
+    investor02Balance = await tempTokenInstance.balanceOf.call(investor02);
+    global.assert.equal(investor02Balance.toNumber(), 50000 * (10 ** 18));
+    totalSupply = await tempTokenInstance.totalSupply.call();
+    global.assert.closeTo(totalSupply.toNumber(), 907142 * (10 ** 18), 1 * (10 ** 18));
+    investorBalanceAfter = await global.web3.eth.getBalance(investor02);
+    global.assert(investorBalanceAfter - investorBalanceBefore, 146.4 * (10 ** 18));
+
+    isValidRecord = await tempCentralBankInstance.validateInvestmentRecord
+      .call(investor02, 0, 0, 10 * (10 ** 18), 100000 * (10 ** 18),
+            5 * (10 ** 18), 50000 * (10 ** 18));
+    global.assert.equal(isValidRecord, true);
+    isValidRecord = await tempCentralBankInstance.validateInvestmentRecord
+      .call(investor02, 1, 100000 * (10 ** 18), 200 * (10 ** 18), 1900000 * (10 ** 18),
+            200 * (10 ** 18), 1900000 * (10 ** 18));
+    global.assert.equal(isValidRecord, true);
+
+    // sleep
+    await new Promise((resolve) => setTimeout(resolve, tempFirstRefundRoundDuration * 1000));
+
+    // third refund
+    investorBalanceBefore = await global.web3.eth.getBalance(investor02);
+    await tempTokenInstance.transfer.sendTransaction(tempCentralBankInstance.address, 50000 * (10 ** 18),
+                                                     { from: investor02 });
+    investor02Balance = await tempTokenInstance.balanceOf.call(investor02);
+    global.assert.equal(investor02Balance.toNumber(), 0);
+    totalSupply = await tempTokenInstance.totalSupply.call();
+    global.assert.closeTo(totalSupply.toNumber(), 857142 * (10 ** 18), 1 * (10 ** 18));
+    investorBalanceAfter = await global.web3.eth.getBalance(investor02);
+    global.assert(investorBalanceAfter - investorBalanceBefore, 64 * (10 ** 18));
+
+    isValidRecord = await tempCentralBankInstance.validateInvestmentRecord
+      .call(investor02, 0, 0, 10 * (10 ** 18), 100000 * (10 ** 18),
+            10 * (10 ** 18), 100000 * (10 ** 18));
+    global.assert.equal(isValidRecord, true);
+    isValidRecord = await tempCentralBankInstance.validateInvestmentRecord
+      .call(investor02, 1, 100000 * (10 ** 18), 200 * (10 ** 18), 1900000 * (10 ** 18),
+            200 * (10 ** 18), 1900000 * (10 ** 18));
+    global.assert.equal(isValidRecord, true);
 
     // global.console.log(new Date().getTime());
   });
