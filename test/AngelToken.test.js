@@ -12,7 +12,7 @@ global.contract('AngelToken', () => {
     global.assert.equal(totalSupply, 0);
   });
 
-  global.it('should check name, symbol and decimals of the token', async () => {
+  global.it('should check name, symbol, decimals, owner of the token', async () => {
     const centralBankInstance = await CentralBank.deployed();
     const tokenAddress = await centralBankInstance.angelToken.call();
     const tokenInstance = await AngelToken.at(tokenAddress);
@@ -25,6 +25,9 @@ global.contract('AngelToken', () => {
 
     const decimals = await tokenInstance.decimals.call();
     global.assert.equal(decimals, 18);
+
+    const owner = await tokenInstance.owner.call();
+    global.assert.equal(owner, '0xF488ecd0120B75b97378e4941Eb6B3c8ec49d748'.toLowerCase());
   });
 
   global.it('should check that token is paused', async () => {

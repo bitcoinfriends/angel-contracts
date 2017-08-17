@@ -48,13 +48,13 @@ contract CentralBank {
 
   /* Storage - state */
 
-  bool public isICOConfigured = false;
+    // todo hardcode values
   address public angelAdminAddress;
-  address public angelFoundationAddress = address(0x0);
-  uint public icoLaunchTimestamp;
-  uint public icoFinishTimestamp;
-  uint public firstRefundRoundFinishTimestamp;
-  uint public secondRefundRoundFinishTimestamp;
+  address public angelFoundationAddress = address(0xF488ecd0120B75b97378e4941Eb6B3c8ec49d748);
+  uint public icoLaunchTimestamp = 1504224000;
+  uint public icoFinishTimestamp = 1504224000 + 30 days;
+  uint public firstRefundRoundFinishTimestamp = 1504224000 + 130 days;
+  uint public secondRefundRoundFinishTimestamp = 1504224000 + 230 days;
 
   AngelToken public angelToken;
 
@@ -76,59 +76,13 @@ contract CentralBank {
   function CentralBank() {
     angelAdminAddress = msg.sender;
 
-    icoLaunchTimestamp = now + 1 days;
-    icoFinishTimestamp = icoLaunchTimestamp + 30 days;
-    firstRefundRoundFinishTimestamp = icoFinishTimestamp + 100 days;
-    secondRefundRoundFinishTimestamp = firstRefundRoundFinishTimestamp + 100 days;
-
     angelToken = new AngelToken();
     angelToken.enableManager(address(this));
     angelToken.grantManagerPermission(address(this), 'mint_tokens');
     angelToken.grantManagerPermission(address(this), 'burn_tokens');
     angelToken.grantManagerPermission(address(this), 'unpause_contract');
-    angelToken.transferOwnership(angelAdminAddress);
+    angelToken.transferOwnership(angelFoundationAddress);
   }
-
-  function setICOConfig(
-    address _newFoundationAddress,
-    uint _icoLaunchTimestamp,
-    uint _icoDuration,
-    uint _firstRefundRoundDuration,
-    uint _secondRefundRoundDuration
-  ) {
-    require(now < icoLaunchTimestamp);
-    require(msg.sender == angelFoundationAddress || msg.sender == angelAdminAddress);
-    require(_newFoundationAddress != address(0x0));
-
-    isICOConfigured = true;
-    angelFoundationAddress = _newFoundationAddress;
-    icoLaunchTimestamp = _icoLaunchTimestamp;
-    icoFinishTimestamp = icoLaunchTimestamp + _icoDuration;
-    firstRefundRoundFinishTimestamp = icoFinishTimestamp + _firstRefundRoundDuration;
-    secondRefundRoundFinishTimestamp = firstRefundRoundFinishTimestamp + _secondRefundRoundDuration;
-  }
-
-  function setTokenPrice(uint _initialTokenPrice) {
-    require(now < icoLaunchTimestamp);
-    require(msg.sender == angelFoundationAddress || msg.sender == angelAdminAddress);
-
-    initialTokenPrice = _initialTokenPrice;
-  }
-
-  function setFoundationAddress(address _newFoundationAddress) {
-    require(_newFoundationAddress != address(0x0));
-    require(msg.sender == angelFoundationAddress);
-
-    angelFoundationAddress = _newFoundationAddress;
-  }
-
-  function setAdminAddress(address _newAdminAddress) {
-    require(_newAdminAddress != address(0x0));
-    require(msg.sender == angelFoundationAddress || msg.sender == angelAdminAddress);
-
-    angelAdminAddress = _newAdminAddress;
-  }
-
 
   /* Investments */
 
@@ -143,7 +97,6 @@ contract CentralBank {
    * @dev Process new ETH investment and sends tokens back
    */
   function angelRaise() internal {
-    require(isICOConfigured == true);
     require(msg.value >= 0);
     require(now >= icoLaunchTimestamp && now < icoFinishTimestamp);
 
@@ -215,6 +168,8 @@ contract CentralBank {
 
     require(_purchasedTokensWei > 0);
     require(_totalTokensSoldBefore + _purchasedTokensWei <= icoCap);
+    // todo return remaining ETH
+
 
     return _purchasedTokensWei;
   }
@@ -406,24 +361,8 @@ contract CentralBank {
     }
   }
 
-
-  /* Debug. Used by unit tests only */
-
-  function validateInvestmentRecord(
-    address _investor,
-    uint _recordIndex,
-    uint _tokensSoldBeforeWei,
-    uint _investedEthWei,
-    uint _purchasedTokensWei,
-    uint _refundedEthWei,
-    uint _returnedTokensWei
-  )
-    constant returns (bool)
-  {
-    return investments[_investor][_recordIndex].tokensSoldBeforeWei == _tokensSoldBeforeWei &&
-           investments[_investor][_recordIndex].investedEthWei == _investedEthWei &&
-           investments[_investor][_recordIndex].purchasedTokensWei == _purchasedTokensWei &&
-           investments[_investor][_recordIndex].refundedEthWei == _refundedEthWei &&
-           investments[_investor][_recordIndex].returnedTokensWei == _returnedTokensWei;
+  function assertFoundationAddress() constant returns (bool){
+    require(msg.sender == angelFoundationAddress);
+    return true;
   }
 }
