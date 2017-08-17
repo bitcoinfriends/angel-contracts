@@ -48,7 +48,7 @@ contract CentralBank {
 
   /* Storage - state */
 
-    // todo hardcode values
+  // todo hardcode values
   address public angelAdminAddress;
   address public angelFoundationAddress = address(0xF488ecd0120B75b97378e4941Eb6B3c8ec49d748);
   uint public icoLaunchTimestamp = 1504224000;
@@ -158,7 +158,7 @@ contract CentralBank {
       // get landmark values
       _landmarkPrice = calculateLandmarkPrice(_totalTokensSoldBefore + _purchasedTokensWei);
       _maxLandmarkTokensWei = landmarkSize - ((_totalTokensSoldBefore + _purchasedTokensWei) % landmarkSize);
-      if (_totalTokensSoldBefore + _purchasedTokensWei + _maxLandmarkTokensWei > icoCap) {
+      if (_totalTokensSoldBefore + _purchasedTokensWei + _maxLandmarkTokensWei >= icoCap) {
         _maxLandmarkTokensWei = icoCap - _totalTokensSoldBefore - _purchasedTokensWei;
         _isCapReached = true;
       }
@@ -176,7 +176,7 @@ contract CentralBank {
     }
     while ((_notProcessedEthWei > 0) && (_isCapReached == false));
 
-    require(_purchasedTokensWei > 0);
+    assert(_purchasedTokensWei > 0);
 
     return (_purchasedTokensWei, _notProcessedEthWei);
   }
@@ -201,8 +201,10 @@ contract CentralBank {
     uint _recordTokensWeiToProcess = 0;
     uint _tokensSoldWei = 0;
     uint _recordRefundedEthWei = 0;
-    for (uint _recordID = _allRecordsNumber - 1; _recordID >= 0; _recordID -= 1) {
-      if (investments[_investor][_recordID].purchasedTokensWei <= investments[_investor][_recordID].returnedTokensWei) {
+    uint _recordNotProcessedTokensWei = 0;
+    for (uint _recordID = 0; _recordID < _allRecordsNumber; _recordID += 1) {
+      if (investments[_investor][_recordID].purchasedTokensWei <= investments[_investor][_recordID].returnedTokensWei ||
+          investments[_investor][_recordID].investedEthWei <= investments[_investor][_recordID].refundedEthWei) {
         // tokens already refunded
         continue;
       }
@@ -212,16 +214,17 @@ contract CentralBank {
                                     investments[_investor][_recordID].returnedTokensWei;
       _recordTokensWeiToProcess = (_notProcessedTokensWei < _recordMaxReturnedTokensWei) ? _notProcessedTokensWei :
                                                                                            _recordMaxReturnedTokensWei;
-      _tokensSoldWei = investments[_investor][_recordID].tokensSoldBeforeWei + _recordMaxReturnedTokensWei;
       assert(_recordTokensWeiToProcess > 0);
 
       // calculate amount of ETH to send back
-      _recordRefundedEthWei = calculateRefundedEth(_tokensSoldWei, _recordTokensWeiToProcess);
+      _tokensSoldWei = investments[_investor][_recordID].tokensSoldBeforeWei + investments[_investor][_recordID].returnedTokensWei;
+      (_recordRefundedEthWei, _recordNotProcessedTokensWei) = calculateRefundedEth(_tokensSoldWei, _recordTokensWeiToProcess);
       if (_recordRefundedEthWei > (investments[_investor][_recordID].investedEthWei - investments[_investor][_recordID].refundedEthWei)) {
         // this can happen due to rounding error
         _recordRefundedEthWei = (investments[_investor][_recordID].investedEthWei - investments[_investor][_recordID].refundedEthWei);
       }
       assert(_recordRefundedEthWei > 0);
+      assert(_recordNotProcessedTokensWei == 0);
 
       // persist changes to the storage
       _refundedEthWei += _recordRefundedEthWei;
@@ -246,11 +249,11 @@ contract CentralBank {
     uint _refundedEthWeiWithDiscount = calculateRefundedEthWithDiscount(_refundedEthWei);
 
     // transfer ETH and remaining tokens
-    _investor.transfer(_refundedEthWeiWithDiscount);
     angelToken.burn(_returnedTokensWei - _notProcessedTokensWei);
     if (_notProcessedTokensWei > 0) {
       angelToken.transfer(_investor, _notProcessedTokensWei);
     }
+    _investor.transfer(_refundedEthWeiWithDiscount);
 
     // fire event
     RefundEvent(_investor, _refundedEthWeiWithDiscount, _returnedTokensWei - _notProcessedTokensWei);
@@ -276,48 +279,51 @@ contract CentralBank {
 
   /**
    * @dev Calculate amount of ETH for refunded tokens. Just abstract price ladder
-   * @param _tokensSoldWei     uint Amount of tokens that have been sold (starting point) [token wei]
+   * @param _totalTokensSoldBefore     uint Amount of tokens that have been sold (starting point) [token wei]
    * @param _returnedTokensWei uint Amount of tokens to refund [token wei]
    * @return Refunded amount of ETH [ETH wei] (without discounts)
    */
   function calculateRefundedEth(
-    uint _tokensSoldWei,
+    uint _totalTokensSoldBefore,
     uint _returnedTokensWei
   )
-    constant returns (uint)
+    constant returns (uint _refundedEthWei, uint _notProcessedTokensWei)
   {
-    uint _refundedEthWei = 0;
-    uint _notProcessedTokensWei = _returnedTokensWei;
+    _refundedEthWei = 0;
+    uint _refundedTokensWei = 0;
+    _notProcessedTokensWei = _returnedTokensWei;
 
-    uint _iterStartingPoint = 0;
     uint _landmarkPrice = 0;
     uint _maxLandmarkTokensWei = 0;
     uint _maxLandmarkEthWei = 0;
+    bool _isCapReached = false;
     do {
       // get landmark values
-      _iterStartingPoint = _tokensSoldWei - _returnedTokensWei + _notProcessedTokensWei;
-      if (_iterStartingPoint % landmarkSize == 0) {
-        _landmarkPrice = calculateLandmarkPrice(_iterStartingPoint - 1);
-        _maxLandmarkTokensWei = landmarkSize;
-      }
-      else {
-        _landmarkPrice = calculateLandmarkPrice(_iterStartingPoint);
-        _maxLandmarkTokensWei = (_iterStartingPoint % landmarkSize);
+      _landmarkPrice = calculateLandmarkPrice(_totalTokensSoldBefore + _refundedTokensWei);
+      _maxLandmarkTokensWei = landmarkSize - ((_totalTokensSoldBefore + _refundedTokensWei) % landmarkSize);
+      if (_totalTokensSoldBefore + _refundedTokensWei + _maxLandmarkTokensWei >= icoCap) {
+        _maxLandmarkTokensWei = icoCap - _totalTokensSoldBefore - _refundedTokensWei;
+        _isCapReached = true;
       }
       _maxLandmarkEthWei = _maxLandmarkTokensWei * _landmarkPrice / (10 ** 18);
 
       // check investment against landmark values
       if (_notProcessedTokensWei > _maxLandmarkTokensWei) {
         _refundedEthWei += _maxLandmarkEthWei;
+        _refundedTokensWei += _maxLandmarkTokensWei;
         _notProcessedTokensWei -= _maxLandmarkTokensWei;
       }
       else {
         _refundedEthWei += _notProcessedTokensWei * _landmarkPrice / (10 ** 18);
+        _refundedTokensWei += _notProcessedTokensWei;
         _notProcessedTokensWei = 0;
       }
-    } while (_notProcessedTokensWei > 0);
+    }
+    while ((_notProcessedTokensWei > 0) && (_isCapReached == false));
 
-    return _refundedEthWei;
+    assert(_refundedEthWei > 0);
+
+    return (_refundedEthWei, _notProcessedTokensWei);
   }
 
 

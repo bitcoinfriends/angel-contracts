@@ -12,9 +12,6 @@ import '../token/AngelToken.sol';
  */
 contract CentralBankTest is CentralBank {
 
-  bool public isICOConfigured = false;
-
-
   /* Constructor and config */
 
   function setICOConfig(
@@ -27,7 +24,6 @@ contract CentralBankTest is CentralBank {
     require(msg.sender == angelFoundationAddress || msg.sender == angelAdminAddress);
     require(_newFoundationAddress != address(0x0));
 
-    isICOConfigured = true;
     angelFoundationAddress = _newFoundationAddress;
     icoLaunchTimestamp = _icoLaunchTimestamp;
     icoFinishTimestamp = icoLaunchTimestamp + _icoDuration;
@@ -39,20 +35,6 @@ contract CentralBankTest is CentralBank {
     require(msg.sender == angelFoundationAddress || msg.sender == angelAdminAddress);
 
     initialTokenPrice = _initialTokenPrice;
-  }
-
-  function setFoundationAddress(address _newFoundationAddress) {
-    require(_newFoundationAddress != address(0x0));
-    require(msg.sender == angelFoundationAddress);
-
-    angelFoundationAddress = _newFoundationAddress;
-  }
-
-  function setAdminAddress(address _newAdminAddress) {
-    require(_newAdminAddress != address(0x0));
-    require(msg.sender == angelFoundationAddress || msg.sender == angelAdminAddress);
-
-    angelAdminAddress = _newAdminAddress;
   }
 
 
