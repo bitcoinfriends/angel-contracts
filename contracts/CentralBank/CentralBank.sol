@@ -30,7 +30,8 @@ contract CentralBank {
   uint public initialTokenPrice = 1 * (10 ** 18) / (10 ** 4); // means 0.0001 ETH for one token
 
   uint public landmarkSize = 1000000 * (10 ** 18);
-  uint public landmarkPriceStep = 1 * (10 ** 18) / (10 ** 5);
+  uint public landmarkPriceStepNumerator = 10;
+  uint public landmarkPriceStepDenominator = 100;
 
   uint public firstRefundRoundRateNumerator = 80;
   uint public firstRefundRoundRateDenominator = 100;
@@ -366,7 +367,7 @@ contract CentralBank {
    * @return Calculated price
    */
   function calculateLandmarkPrice(uint _totalTokensSoldBefore) constant returns (uint) {
-    return initialTokenPrice + landmarkPriceStep * (_totalTokensSoldBefore / landmarkSize);
+    return initialTokenPrice + initialTokenPrice * landmarkPriceStepNumerator / landmarkPriceStepDenominator * (_totalTokensSoldBefore / landmarkSize);
   }
 
 
