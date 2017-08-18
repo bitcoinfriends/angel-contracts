@@ -53,8 +53,8 @@ contract CentralBank {
   address public angelFoundationAddress = address(0xF488ecd0120B75b97378e4941Eb6B3c8ec49d748);
   uint public icoLaunchTimestamp = 1504224000;
   uint public icoFinishTimestamp = 1504224000 + 30 days;
-  uint public firstRefundRoundFinishTimestamp = 1504224000 + 130 days;
-  uint public secondRefundRoundFinishTimestamp = 1504224000 + 230 days;
+  uint public firstRefundRoundFinishTimestamp = 1504224000 + 100 days;
+  uint public secondRefundRoundFinishTimestamp = 1504224000 + 200 days;
 
   AngelToken public angelToken;
 

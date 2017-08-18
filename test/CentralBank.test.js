@@ -3,11 +3,13 @@ const CentralBank     = global.artifacts.require('CentralBank.sol');
 const CentralBankTest = global.artifacts.require('CentralBankTest.sol');
 
 
-const verifyContractConfig = async (centralBankInstance, targetFoundationAddress,
-                                    targetIcoLaunchTimestamp,
-                                    targetIcoDuration,
-                                    targetFirstRefundRoundDuration,
-                                    targetSecondRefundRoundDuration) => {
+const verifyContractConfig = async (
+  centralBankInstance,
+  targetFoundationAddress,
+  targetIcoLaunchTimestamp,
+  targetIcoFinishTimestamp,
+  targetFirstRefundRoundFinishTimestamp,
+  targetSecondRefundRoundFinishTimestamp) => {
   const angelFoundationAddress = await centralBankInstance.angelFoundationAddress.call();
   global.assert.equal(angelFoundationAddress, targetFoundationAddress);
 
@@ -17,16 +19,9 @@ const verifyContractConfig = async (centralBankInstance, targetFoundationAddress
   const secondRefundRoundFinishTimestamp = await centralBankInstance.secondRefundRoundFinishTimestamp.call();
 
   global.assert.equal(icoLaunchTimestamp.toNumber(), targetIcoLaunchTimestamp);
-  global.assert.equal(icoFinishTimestamp.toNumber(), targetIcoLaunchTimestamp + targetIcoDuration);
-  global.assert.equal(firstRefundRoundFinishTimestamp.toNumber(),
-                      targetIcoLaunchTimestamp +
-                      targetIcoDuration +
-                      targetFirstRefundRoundDuration);
-  global.assert.equal(secondRefundRoundFinishTimestamp.toNumber(),
-                      targetIcoLaunchTimestamp +
-                      targetIcoDuration +
-                      targetFirstRefundRoundDuration +
-                      targetSecondRefundRoundDuration);
+  global.assert.equal(icoFinishTimestamp.toNumber(), targetIcoFinishTimestamp);
+  global.assert.equal(firstRefundRoundFinishTimestamp.toNumber(), targetFirstRefundRoundFinishTimestamp);
+  global.assert.equal(secondRefundRoundFinishTimestamp.toNumber(), targetSecondRefundRoundFinishTimestamp);
 };
 
 
@@ -38,7 +33,7 @@ global.contract('CentralBank', (accounts) => {
   const investor02 = accounts[2];
 
   const tempIcoDuration               = 10;
-  const tempFirstRefundRoundDuration  = 10;
+  const tempFirstRefundRoundDuration  = 20;
   const tempSecondRefundRoundDuration = 10;
 
   let centralBankInstance;
@@ -61,9 +56,9 @@ global.contract('CentralBank', (accounts) => {
     await verifyContractConfig(centralBankInstance,
                                foundation,
                                tempIcoLaunchTimestamp,
-                               tempIcoDuration,
-                               tempFirstRefundRoundDuration,
-                               tempSecondRefundRoundDuration);
+                               tempIcoLaunchTimestamp + tempIcoDuration,
+                               tempIcoLaunchTimestamp + tempFirstRefundRoundDuration,
+                               tempIcoLaunchTimestamp + tempFirstRefundRoundDuration + tempSecondRefundRoundDuration);
 
     // global.console.log('Temp CentralBank deployed: ' + centralBankInstance.address);
   });
@@ -79,9 +74,9 @@ global.contract('CentralBank', (accounts) => {
     await verifyContractConfig(deployedCentralBankInstance,
                                '0xf488ecd0120b75b97378e4941eb6b3c8ec49d748',
                                1504224000,
-                               2592000,
-                               8640000,
-                               8640000);
+                               1506816000,
+                               1512864000,
+                               1521504000);
   });
 
 
@@ -140,9 +135,9 @@ global.contract('CentralBank', (accounts) => {
     await verifyContractConfig(centralBankInstance,
                                foundation,
                                tempIcoLaunchTimestamp,
-                               tempIcoDuration,
-                               tempFirstRefundRoundDuration,
-                               tempSecondRefundRoundDuration);
+                               tempIcoLaunchTimestamp + tempIcoDuration,
+                               tempIcoLaunchTimestamp + tempFirstRefundRoundDuration,
+                               tempIcoLaunchTimestamp + tempFirstRefundRoundDuration + tempSecondRefundRoundDuration);
 
     let milestonePrice = await centralBankInstance.calculateLandmarkPrice.call(0);
     global.assert.equal(milestonePrice.toNumber(), 1 * (10 ** 10));
@@ -240,7 +235,8 @@ global.contract('CentralBank', (accounts) => {
   global.it('should test that calculation of purchased tokens processes investments cap correctly', async () => {
     // global.console.log(new Date().getTime());
 
-    const purchasedTokens = await centralBankInstance.calculatePurchasedTokens.call(69999999 * (10 ** 18), 1 * (10 ** 18));
+    const purchasedTokens = await centralBankInstance.calculatePurchasedTokens.call(69999999 * (10 ** 18),
+                                                                                    1 * (10 ** 18));
     global.assert.equal(purchasedTokens[0].toNumber(), 1 * (10 ** 18));
     global.assert.equal(purchasedTokens[1].toNumber(), 999210000000000000);
 
@@ -468,7 +464,7 @@ global.contract('CentralBank', (accounts) => {
     global.assert.equal(isValidRecord, true);
 
     // sleep
-    await new Promise((resolve) => setTimeout(resolve, tempFirstRefundRoundDuration * 1000));
+    await new Promise((resolve) => setTimeout(resolve, (tempFirstRefundRoundDuration - tempIcoDuration) * 1000));
 
     // third refund
     investorBalanceBefore = await global.web3.eth.getBalance(investor02);

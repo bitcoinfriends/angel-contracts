@@ -27,7 +27,7 @@ contract CentralBankTest is CentralBank {
     angelFoundationAddress = _newFoundationAddress;
     icoLaunchTimestamp = _icoLaunchTimestamp;
     icoFinishTimestamp = icoLaunchTimestamp + _icoDuration;
-    firstRefundRoundFinishTimestamp = icoFinishTimestamp + _firstRefundRoundDuration;
+    firstRefundRoundFinishTimestamp = icoLaunchTimestamp + _firstRefundRoundDuration;
     secondRefundRoundFinishTimestamp = firstRefundRoundFinishTimestamp + _secondRefundRoundDuration;
   }
 
