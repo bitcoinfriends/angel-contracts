@@ -41,14 +41,18 @@ global.contract('CentralBank', (accounts) => {
   let tempTokenInstance;
 
   beforeEach(async () => { // eslint-disable-line no-undef
-    const tempIcoLaunchTimestamp = Math.round(new Date().getTime() / 1000) - 3;
+    const tempIcoLaunchTimestamp               = Math.round(new Date().getTime() / 1000) - 3;
+    const tempIcoFinishTimestamp               = tempIcoLaunchTimestamp + tempIcoDuration;
+    const tempFirstRefundRoundFinishTimestamp  = tempIcoLaunchTimestamp + tempFirstRefundRoundDuration;
+    const tempSecondRefundRoundFinishTimestamp = tempIcoLaunchTimestamp + tempFirstRefundRoundDuration +
+                                                 tempSecondRefundRoundDuration;
 
     centralBankInstance = await CentralBankTest.new({ from: admin });
     await centralBankInstance.setICOConfig.sendTransaction(foundation,
                                                            tempIcoLaunchTimestamp,
-                                                           tempIcoDuration,
-                                                           tempFirstRefundRoundDuration,
-                                                           tempSecondRefundRoundDuration,
+                                                           tempIcoFinishTimestamp,
+                                                           tempFirstRefundRoundFinishTimestamp,
+                                                           tempSecondRefundRoundFinishTimestamp,
                                                            { from: admin });
 
     const tokenAddress = await centralBankInstance.angelToken.call();
@@ -119,15 +123,19 @@ global.contract('CentralBank', (accounts) => {
   global.it('should test price ladder for smaller initial price', async () => {
     // global.console.log(new Date().getTime());
 
-    const tempIcoLaunchTimestamp = Math.round(new Date().getTime() / 1000) - 3;
+    const tempIcoLaunchTimestamp               = Math.round(new Date().getTime() / 1000) - 3;
+    const tempIcoFinishTimestamp               = tempIcoLaunchTimestamp + tempIcoDuration;
+    const tempFirstRefundRoundFinishTimestamp  = tempIcoLaunchTimestamp + tempFirstRefundRoundDuration;
+    const tempSecondRefundRoundFinishTimestamp = tempIcoLaunchTimestamp + tempFirstRefundRoundDuration +
+                                                 tempSecondRefundRoundDuration;
 
     centralBankInstance = await CentralBankTest.new({ from: admin });
     await centralBankInstance.setTokenPrice.sendTransaction(10 ** 10, { from: admin });
     await centralBankInstance.setICOConfig.sendTransaction(foundation,
                                                            tempIcoLaunchTimestamp,
-                                                           tempIcoDuration,
-                                                           tempFirstRefundRoundDuration,
-                                                           tempSecondRefundRoundDuration,
+                                                           tempIcoFinishTimestamp,
+                                                           tempFirstRefundRoundFinishTimestamp,
+                                                           tempSecondRefundRoundFinishTimestamp,
                                                            { from: admin });
 
     const tokenAddress = await centralBankInstance.angelToken.call();

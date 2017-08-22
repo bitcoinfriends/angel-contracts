@@ -17,18 +17,21 @@ contract CentralBankTest is CentralBank {
   function setICOConfig(
     address _newFoundationAddress,
     uint _icoLaunchTimestamp,
-    uint _icoDuration,
-    uint _firstRefundRoundDuration,
-    uint _secondRefundRoundDuration
+    uint _icoFinishTimestamp,
+    uint _firstRefundRoundFinishTimestamp,
+    uint _secondRefundRoundFinishTimestamp
   ) {
     require(msg.sender == angelFoundationAddress || msg.sender == angelAdminAddress);
     require(_newFoundationAddress != address(0x0));
+    require(_icoFinishTimestamp > _icoLaunchTimestamp);
+    require(_firstRefundRoundFinishTimestamp > _icoLaunchTimestamp);
+    require(_secondRefundRoundFinishTimestamp > _firstRefundRoundFinishTimestamp);
 
     angelFoundationAddress = _newFoundationAddress;
     icoLaunchTimestamp = _icoLaunchTimestamp;
-    icoFinishTimestamp = icoLaunchTimestamp + _icoDuration;
-    firstRefundRoundFinishTimestamp = icoLaunchTimestamp + _firstRefundRoundDuration;
-    secondRefundRoundFinishTimestamp = firstRefundRoundFinishTimestamp + _secondRefundRoundDuration;
+    icoFinishTimestamp = _icoFinishTimestamp;
+    firstRefundRoundFinishTimestamp = _firstRefundRoundFinishTimestamp;
+    secondRefundRoundFinishTimestamp = _secondRefundRoundFinishTimestamp;
   }
 
   function setTokenPrice(uint _initialTokenPrice) {
