@@ -27,10 +27,11 @@ const verifyContractConfig = async (
 
 global.contract('CentralBank', (accounts) => {
   // config
-  const admin      = accounts[0];
-  const foundation = accounts[1];
-  const investor01 = accounts[2];
-  const investor02 = accounts[2];
+  const admin       = accounts[0];
+  const foundation  = accounts[1];
+  const investor01  = accounts[2];
+  const investor02  = accounts[3];
+  const miscAddress = accounts[4];
 
   const tempIcoDuration               = 10;
   const tempFirstRefundRoundDuration  = 20;
@@ -511,9 +512,12 @@ global.contract('CentralBank', (accounts) => {
       { from: investor01, to: centralBankInstance.address, value: 7 * (10 ** 16), gas: 250000 });
     investor01Balance = await tempTokenInstance.balanceOf.call(investor01);
     global.assert.equal(investor01Balance.toNumber(), 700 * (10 ** 18));
+    const foundationBalance = await tempTokenInstance.balanceOf.call(foundation);
+    global.assert.equal(foundationBalance.toNumber(), 300 * (10 ** 18));
     totalSupply = await tempTokenInstance.totalSupply.call();
     global.assert.closeTo(totalSupply.toNumber(), 1000 * (10 ** 18), 1 * (10 ** 18));
-
+    isPaused = await tempTokenInstance.getPaused.call();
+    global.assert.equal(isPaused, true);
     const isValidRecord = await centralBankInstance.validateInvestmentRecord
       .call(investor01, 0, 0, 7 * (10 ** 16), 700 * (10 ** 18), 0, 0);
     global.assert.equal(isValidRecord, true);
@@ -522,13 +526,22 @@ global.contract('CentralBank', (accounts) => {
     await new Promise((resolve) => setTimeout(resolve, tempIcoDuration * 1000));
 
     // unpause token
-    await centralBankInstance.unpauseAngelToken.sendTransaction();
+    await centralBankInstance.unpauseAngelToken.sendTransaction({ from: miscAddress });
 
     // test angel token
-    const foundationBalance = await tempTokenInstance.balanceOf.call(foundation);
-    global.assert.equal(foundationBalance.toNumber(), 300 * (10 ** 18));
     isPaused = await tempTokenInstance.getPaused.call();
     global.assert.equal(isPaused, false);
+
+    // test that transfers are possible
+    investor01Balance = await tempTokenInstance.balanceOf.call(investor01);
+    global.assert.equal(investor01Balance.toNumber(), 700 * (10 ** 18));
+    let investor02Balance = await tempTokenInstance.balanceOf.call(investor02);
+    global.assert.equal(investor02Balance.toNumber(), 0);
+    await tempTokenInstance.transfer.sendTransaction(investor02, 200 * (10 ** 18), { from: investor01 });
+    investor01Balance = await tempTokenInstance.balanceOf.call(investor01);
+    global.assert.equal(investor01Balance.toNumber(), 500 * (10 ** 18));
+    investor02Balance = await tempTokenInstance.balanceOf.call(investor02);
+    global.assert.equal(investor02Balance.toNumber(), 200 * (10 ** 18));
   });
 
   global.it('should test withdrawing of funds', async () => {
