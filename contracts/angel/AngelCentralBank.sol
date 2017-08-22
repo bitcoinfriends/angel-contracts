@@ -365,9 +365,4 @@ contract AngelCentralBank {
       angelFoundationAddress.transfer(this.balance);
     }
   }
-
-  function assertFoundationAddress() constant returns (bool){
-    require(msg.sender == angelFoundationAddress);
-    return true;
-  }
 }
