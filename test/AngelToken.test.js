@@ -1,5 +1,5 @@
 const AngelToken = global.artifacts.require('AngelToken.sol');
-const CentralBank = global.artifacts.require('CentralBank.sol');
+const CentralBank = global.artifacts.require('AngelCentralBank.sol');
 
 
 global.contract('AngelToken', () => {

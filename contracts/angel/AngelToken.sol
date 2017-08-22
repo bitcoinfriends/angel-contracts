@@ -4,8 +4,8 @@ pragma solidity ^0.4.13;
 import "zeppelin-solidity/contracts/token/StandardToken.sol";
 import "../utils/Manageable.sol";
 import "../utils/Pausable.sol";
-import "../CentralBank/CentralBank.sol";
-import "./NamedToken.sol";
+import "../token/NamedToken.sol";
+import "./AngelCentralBank.sol";
 
 
 /**
@@ -44,7 +44,7 @@ contract AngelToken is StandardToken, NamedToken, Pausable {
 
     bool result = super.transfer(_to, _value);
     if (result == true && _to == centralBankAddress) {
-      CentralBank(centralBankAddress).angelBurn(msg.sender, _value);
+      AngelCentralBank(centralBankAddress).angelBurn(msg.sender, _value);
     }
     return result;
   }
@@ -58,7 +58,7 @@ contract AngelToken is StandardToken, NamedToken, Pausable {
 
     bool result = super.transferFrom(_from, _to, _value);
     if (result == true && _to == centralBankAddress) {
-      CentralBank(centralBankAddress).angelBurn(_from, _value);
+      AngelCentralBank(centralBankAddress).angelBurn(_from, _value);
     }
     return result;
   }

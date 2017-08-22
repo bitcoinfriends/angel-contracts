@@ -2,15 +2,15 @@ pragma solidity ^0.4.13;
 
 
 import 'zeppelin-solidity/contracts/math/SafeMath.sol';
-import '../token/AngelToken.sol';
+import './AngelCentralBank.sol';
 
 
 /**
- * @title CentralBank
+ * @title AngelCentralBankTest
  *
  * @dev Crowdsale and escrow contract
  */
-contract CentralBankTest is CentralBank {
+contract AngelCentralBankTest is AngelCentralBank {
 
   /* Constructor and config */
 

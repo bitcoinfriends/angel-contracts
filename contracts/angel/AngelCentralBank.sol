@@ -2,15 +2,15 @@ pragma solidity ^0.4.13;
 
 
 import 'zeppelin-solidity/contracts/math/SafeMath.sol';
-import '../token/AngelToken.sol';
+import './AngelToken.sol';
 
 
 /**
- * @title CentralBank
+ * @title AngelCentralBank
  *
  * @dev Crowdsale and escrow contract
  */
-contract CentralBank {
+contract AngelCentralBank {
 
   /* Data structures */
 
@@ -73,7 +73,7 @@ contract CentralBank {
 
   /* Constructor and config */
 
-  function CentralBank() {
+  function AngelCentralBank() {
     angelAdminAddress = msg.sender;
 
     angelToken = new AngelToken();

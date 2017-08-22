@@ -1,6 +1,6 @@
 const AngelToken      = global.artifacts.require('AngelToken.sol');
-const CentralBank     = global.artifacts.require('CentralBank.sol');
-const CentralBankTest = global.artifacts.require('CentralBankTest.sol');
+const CentralBank     = global.artifacts.require('AngelCentralBank.sol');
+const CentralBankTest = global.artifacts.require('AngelCentralBankTest.sol');
 
 
 const verifyContractConfig = async (
@@ -12,6 +12,10 @@ const verifyContractConfig = async (
   targetSecondRefundRoundFinishTimestamp) => {
   const angelFoundationAddress = await centralBankInstance.angelFoundationAddress.call();
   global.assert.equal(angelFoundationAddress, targetFoundationAddress);
+
+  const angelTokenAddress      = await centralBankInstance.angelToken.call();
+  const angelTokenOwnerAddress = await AngelToken.at(angelTokenAddress).owner.call();
+  global.assert.equal(angelTokenOwnerAddress, '0xf488ecd0120b75b97378e4941eb6b3c8ec49d748');
 
   const icoLaunchTimestamp               = await centralBankInstance.icoLaunchTimestamp.call();
   const icoFinishTimestamp               = await centralBankInstance.icoFinishTimestamp.call();
@@ -40,7 +44,7 @@ global.contract('CentralBank', (accounts) => {
   let centralBankInstance;
   let tempTokenInstance;
 
-  beforeEach(async () => { // eslint-disable-line no-undef
+  const deployContracts = async () => {
     const tempIcoLaunchTimestamp               = Math.round(new Date().getTime() / 1000) - 3;
     const tempIcoFinishTimestamp               = tempIcoLaunchTimestamp + tempIcoDuration;
     const tempFirstRefundRoundFinishTimestamp  = tempIcoLaunchTimestamp + tempFirstRefundRoundDuration;
@@ -66,7 +70,7 @@ global.contract('CentralBank', (accounts) => {
                                tempIcoLaunchTimestamp + tempFirstRefundRoundDuration + tempSecondRefundRoundDuration);
 
     // global.console.log('Temp CentralBank deployed: ' + centralBankInstance.address);
-  });
+  };
 
 
   /* Test configuration */
@@ -89,6 +93,8 @@ global.contract('CentralBank', (accounts) => {
 
   global.it('should test price ladder', async () => {
     // global.console.log(new Date().getTime());
+
+    await deployContracts();
 
     let milestonePrice = await centralBankInstance.calculateLandmarkPrice.call(0);
     global.assert.equal(milestonePrice.toNumber(), 1 * (10 ** 14));
@@ -122,6 +128,8 @@ global.contract('CentralBank', (accounts) => {
 
   global.it('should test price ladder for smaller initial price', async () => {
     // global.console.log(new Date().getTime());
+
+    await deployContracts();
 
     const tempIcoLaunchTimestamp               = Math.round(new Date().getTime() / 1000) - 3;
     const tempIcoFinishTimestamp               = tempIcoLaunchTimestamp + tempIcoDuration;
@@ -184,6 +192,8 @@ global.contract('CentralBank', (accounts) => {
   global.it('should make simple test for calculation of purchased tokens', async () => {
     // global.console.log(new Date().getTime());
 
+    await deployContracts();
+
     let purchasedTokens;
 
     purchasedTokens = await centralBankInstance.calculatePurchasedTokens.call(0, 5 * (10 ** 16));
@@ -244,6 +254,8 @@ global.contract('CentralBank', (accounts) => {
   global.it('should test that calculation of purchased tokens processes investments cap correctly', async () => {
     // global.console.log(new Date().getTime());
 
+    await deployContracts();
+
     const purchasedTokens = await centralBankInstance.calculatePurchasedTokens.call(69999999 * (10 ** 18),
                                                                                     1 * (10 ** 18));
     global.assert.equal(purchasedTokens[0].toNumber(), 1 * (10 ** 18));
@@ -254,6 +266,8 @@ global.contract('CentralBank', (accounts) => {
 
   global.it('should test investments', async () => {
     // global.console.log(new Date().getTime());
+
+    await deployContracts();
 
     // check initial state
     let investor01Balance = await tempTokenInstance.balanceOf.call(investor01);
@@ -294,6 +308,8 @@ global.contract('CentralBank', (accounts) => {
   global.it('should test investments cap', async () => {
     // global.console.log(new Date().getTime());
 
+    await deployContracts();
+
     // check initial state
     let investor01Balance = await tempTokenInstance.balanceOf.call(investor01);
     global.assert.equal(investor01Balance.toNumber(), 0);
@@ -331,6 +347,8 @@ global.contract('CentralBank', (accounts) => {
 
   global.it('should make simple test for calculation of refunded tokens', async () => {
     // global.console.log(new Date().getTime());
+
+    await deployContracts();
 
     let purchasedTokens;
 
@@ -391,6 +409,8 @@ global.contract('CentralBank', (accounts) => {
 
   global.it('should test refunds', async () => {
     // global.console.log(new Date().getTime());
+
+    await deployContracts();
 
     // check initial state
     const investor02ETHBalance = await global.web3.eth.getBalance(investor02);
@@ -505,6 +525,8 @@ global.contract('CentralBank', (accounts) => {
   global.it('should test unpausing of angel token', async () => {
     // global.console.log(new Date().getTime());
 
+    await deployContracts();
+
     // check initial state
     const investor01ETHBalance = await global.web3.eth.getBalance(investor01);
     global.assert.isAbove(investor01ETHBalance.toNumber(), 15 * (10 ** 18));
@@ -554,6 +576,8 @@ global.contract('CentralBank', (accounts) => {
 
   global.it('should test withdrawing of funds', async () => {
     // global.console.log(new Date().getTime());
+
+    await deployContracts();
 
     // check initial state
     const investor01Balance = await tempTokenInstance.balanceOf.call(investor01);
