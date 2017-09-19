@@ -68,6 +68,7 @@ contract AngelToken is StandardToken, NamedToken, Pausable {
     balances[_account] = balances[_account].add(_value);
     totalSupply = totalSupply.add(_value);
     MintEvent(_account, _value);
+    Transfer(0x0, _account, _value); // required for blockexplorers
   }
 
   function burn(uint _value) onlyAllowedManager('burn_tokens') {
