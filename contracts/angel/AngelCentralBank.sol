@@ -128,8 +128,6 @@ contract AngelCentralBank {
     if (totalTokensSold >= icoCap) {
       uint diff = icoFinishTimestamp - now;
       icoFinishTimestamp = now;
-      firstRefundRoundFinishTimestamp -= diff;
-      secondRefundRoundFinishTimestamp -= diff;
 
       unpauseAngelToken();
     }
