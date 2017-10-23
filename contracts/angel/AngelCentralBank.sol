@@ -59,6 +59,8 @@ contract AngelCentralBank {
   AngelToken public angelToken;
 
   mapping (address => InvestmentRecord[]) public investments; // investorAddress => list of investments
+  mapping (address => bool) public investors;
+  uint public totalInvestors = 0;
   uint public totalTokensSold = 0;
 
   bool angelTokenUnpaused = false;
@@ -114,6 +116,12 @@ contract AngelCentralBank {
     investments[msg.sender][_newRecordIndex].refundedEthWei = 0;
     investments[msg.sender][_newRecordIndex].returnedTokensWei = 0;
     totalTokensSold += _purchasedTokensWei;
+
+    // calculate stats
+    if (investors[msg.sender] == false) {
+      totalInvestors += 1;
+    }
+    investors[msg.sender] = true;
 
     // transfer tokens and ETH
     angelToken.mint(msg.sender, _purchasedTokensWei);
