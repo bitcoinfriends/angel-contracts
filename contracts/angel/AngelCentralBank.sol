@@ -126,7 +126,6 @@ contract AngelCentralBank {
 
     // finish ICO if cap reached
     if (totalTokensSold >= icoCap) {
-      uint diff = icoFinishTimestamp - now;
       icoFinishTimestamp = now;
 
       unpauseAngelToken();
