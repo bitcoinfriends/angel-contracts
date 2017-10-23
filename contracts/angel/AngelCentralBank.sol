@@ -115,13 +115,13 @@ contract AngelCentralBank {
     investments[msg.sender][_newRecordIndex].purchasedTokensWei = _purchasedTokensWei;
     investments[msg.sender][_newRecordIndex].refundedEthWei = 0;
     investments[msg.sender][_newRecordIndex].returnedTokensWei = 0;
-    totalTokensSold += _purchasedTokensWei;
 
     // calculate stats
     if (investors[msg.sender] == false) {
       totalInvestors += 1;
     }
     investors[msg.sender] = true;
+    totalTokensSold += _purchasedTokensWei;
 
     // transfer tokens and ETH
     angelToken.mint(msg.sender, _purchasedTokensWei);
