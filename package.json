@@ -5,7 +5,8 @@
   "main": "truffle.js",
   "scripts": {
     "test": "scripts/test.sh",
-    "console": "truffle console",
+    "console": "./node_modules/.bin/truffle console",
+    "compile": "./node_modules/.bin/truffle compile",
     "coverage": "scripts/coverage.sh",
     "coveralls": "scripts/coveralls.sh",
     "lint": "npm run lint:js",
