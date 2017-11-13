@@ -18,16 +18,16 @@ global.contract('AngelToken', () => {
     const tokenInstance = await AngelToken.at(tokenAddress);
 
     const name = await tokenInstance.name.call();
-    global.assert.equal(name, 'Angel Token');
+    global.assert.equal(name, 'ANGEL');
 
     const symbol = await tokenInstance.symbol.call();
-    global.assert.equal(symbol, 'ANGEL');
+    global.assert.equal(symbol, 'ANG');
 
     const decimals = await tokenInstance.decimals.call();
     global.assert.equal(decimals, 18);
 
     const owner = await tokenInstance.owner.call();
-    global.assert.equal(owner, '0xF488ecd0120B75b97378e4941Eb6B3c8ec49d748'.toLowerCase());
+    global.assert.equal(owner, '0x2b0556a6298eA3D35E90F1df32cc126b31F59770'.toLowerCase());
   });
 
   global.it('should check that token is paused', async () => {

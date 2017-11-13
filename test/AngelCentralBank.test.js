@@ -15,7 +15,7 @@ const verifyContractConfig = async (
 
   const angelTokenAddress      = await centralBankInstance.angelToken.call();
   const angelTokenOwnerAddress = await AngelToken.at(angelTokenAddress).owner.call();
-  global.assert.equal(angelTokenOwnerAddress, '0xf488ecd0120b75b97378e4941eb6b3c8ec49d748');
+  global.assert.equal(angelTokenOwnerAddress, '0x2b0556a6298eA3D35E90F1df32cc126b31F59770'.toLowerCase());
 
   const icoLaunchTimestamp               = await centralBankInstance.icoLaunchTimestamp.call();
   const icoFinishTimestamp               = await centralBankInstance.icoFinishTimestamp.call();
@@ -81,11 +81,11 @@ global.contract('CentralBank', (accounts) => {
     const deployedCentralBankInstance = await CentralBank.deployed();
 
     await verifyContractConfig(deployedCentralBankInstance,
-                               '0xf488ecd0120b75b97378e4941eb6b3c8ec49d748',
-                               1504224000,
-                               1506816000,
-                               1512864000,
-                               1521504000);
+                               '0x2b0556a6298eA3D35E90F1df32cc126b31F59770'.toLowerCase(),
+                               1511784000,
+                               1514376000,
+                               1520424000,
+                               1524744000);
   });
 
 

@@ -29,7 +29,7 @@ contract AngelToken is StandardToken, NamedToken, Pausable {
 
   /* Constructor */
 
-  function AngelToken() NamedToken('Angel Token', 'ANGEL', 18) {
+  function AngelToken() NamedToken('ANGEL', 'ANG', 8) {
     centralBankAddress = msg.sender;
   }
 
