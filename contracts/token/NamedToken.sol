@@ -21,7 +21,7 @@ contract NamedToken {
    * @return Hash of the token`s name
    */
   function getNameHash() constant returns (bytes32 result){
-    return sha3(name);
+    return keccak256(name);
   }
 
   /**
@@ -30,6 +30,6 @@ contract NamedToken {
    * @return Hash of the token`s symbol
    */
   function getSymbolHash() constant returns (bytes32 result){
-    return sha3(symbol);
+    return keccak256(symbol);
   }
 }
