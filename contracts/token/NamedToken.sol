@@ -7,9 +7,9 @@ pragma solidity ^0.4.15;
 contract NamedToken {
   string public name;
   string public symbol;
-  uint32 public decimals;
+  uint8 public decimals;
 
-  function NamedToken(string _name, string _symbol, uint32 _decimals) {
+  function NamedToken(string _name, string _symbol, uint8 _decimals) {
     name = _name;
     symbol = _symbol;
     decimals = _decimals;
