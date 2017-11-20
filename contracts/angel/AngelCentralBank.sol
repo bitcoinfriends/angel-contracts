@@ -25,26 +25,26 @@ contract AngelCentralBank {
 
   /* Storage - config */
 
-  uint public icoCap = 70000000 * (10 ** 18);
+  uint public constant icoCap = 70000000 * (10 ** 18);
 
   uint public initialTokenPrice = 1 * (10 ** 18) / (10 ** 4); // means 0.0001 ETH for one token
 
-  uint public landmarkSize = 1000000 * (10 ** 18);
-  uint public landmarkPriceStepNumerator = 10;
-  uint public landmarkPriceStepDenominator = 100;
+  uint public constant landmarkSize = 1000000 * (10 ** 18);
+  uint public constant landmarkPriceStepNumerator = 10;
+  uint public constant landmarkPriceStepDenominator = 100;
 
-  uint public firstRefundRoundRateNumerator = 80;
-  uint public firstRefundRoundRateDenominator = 100;
-  uint public secondRefundRoundRateNumerator = 40;
-  uint public secondRefundRoundRateDenominator = 100;
+  uint public constant firstRefundRoundRateNumerator = 80;
+  uint public constant firstRefundRoundRateDenominator = 100;
+  uint public constant secondRefundRoundRateNumerator = 40;
+  uint public constant secondRefundRoundRateDenominator = 100;
 
-  uint public initialFundsReleaseNumerator = 20; // part of investment
-  uint public initialFundsReleaseDenominator = 100;
-  uint public afterFirstRefundRoundFundsReleaseNumerator = 50; // part of remaining funds
-  uint public afterFirstRefundRoundFundsReleaseDenominator = 100;
+  uint public constant initialFundsReleaseNumerator = 20; // part of investment
+  uint public constant initialFundsReleaseDenominator = 100;
+  uint public constant afterFirstRefundRoundFundsReleaseNumerator = 50; // part of remaining funds
+  uint public constant afterFirstRefundRoundFundsReleaseDenominator = 100;
 
-  uint public angelFoundationShareNumerator = 30;
-  uint public angelFoundationShareDenominator = 100;
+  uint public constant angelFoundationShareNumerator = 30;
+  uint public constant angelFoundationShareDenominator = 100;
 
   /* Storage - state */
 
