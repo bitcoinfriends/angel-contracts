@@ -106,12 +106,13 @@ contract AngelCentralBank {
     uint _purchasedTokensWei = 0;
     uint _notProcessedEthWei = 0;
     (_purchasedTokensWei, _notProcessedEthWei) = calculatePurchasedTokens(totalTokensSold, msg.value);
+    uint _actualInvestment = (msg.value - _notProcessedEthWei);
 
     // create record for the investment
     uint _newRecordIndex = investments[msg.sender].length;
     investments[msg.sender].length += 1;
     investments[msg.sender][_newRecordIndex].tokensSoldBeforeWei = totalTokensSold;
-    investments[msg.sender][_newRecordIndex].investedEthWei = msg.value;
+    investments[msg.sender][_newRecordIndex].investedEthWei = _actualInvestment;
     investments[msg.sender][_newRecordIndex].purchasedTokensWei = _purchasedTokensWei;
     investments[msg.sender][_newRecordIndex].refundedEthWei = 0;
     investments[msg.sender][_newRecordIndex].returnedTokensWei = 0;
@@ -127,7 +128,7 @@ contract AngelCentralBank {
     angelToken.mint(msg.sender, _purchasedTokensWei);
     angelToken.mint(angelFoundationAddress,
                     _purchasedTokensWei * angelFoundationShareNumerator / (angelFoundationShareDenominator - angelFoundationShareNumerator));
-    angelFoundationAddress.transfer(msg.value * initialFundsReleaseNumerator / initialFundsReleaseDenominator);
+    angelFoundationAddress.transfer(_actualInvestment * initialFundsReleaseNumerator / initialFundsReleaseDenominator);
     if (_notProcessedEthWei > 0) {
       msg.sender.transfer(_notProcessedEthWei);
     }
@@ -140,7 +141,7 @@ contract AngelCentralBank {
     }
 
     // fire event
-    InvestmentEvent(msg.sender, msg.value, _purchasedTokensWei);
+    InvestmentEvent(msg.sender, _actualInvestment, _purchasedTokensWei);
   }
 
   /**
