@@ -342,7 +342,9 @@ contract AngelCentralBank {
    * @return Calculated price
    */
   function calculateLandmarkPrice(uint _totalTokensSoldBefore) constant returns (uint) {
-    return initialTokenPrice + initialTokenPrice * landmarkPriceStepNumerator / landmarkPriceStepDenominator * (_totalTokensSoldBefore / landmarkSize);
+    return initialTokenPrice + initialTokenPrice
+                               * landmarkPriceStepNumerator / landmarkPriceStepDenominator
+                               * (_totalTokensSoldBefore / landmarkSize);
   }
 
 
