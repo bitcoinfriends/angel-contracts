@@ -556,7 +556,7 @@ global.contract('CentralBank', (accounts) => {
     await new Promise((resolve) => setTimeout(resolve, tempIcoDuration * 1000));
 
     // unpause token
-    await centralBankInstance.unpauseAngelToken.sendTransaction({ from: miscAddress });
+    await centralBankInstance.finishIco.sendTransaction({ from: miscAddress });
 
     // test angel token
     isPaused = await tempTokenInstance.getPaused.call();

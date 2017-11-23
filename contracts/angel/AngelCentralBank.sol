@@ -63,7 +63,7 @@ contract AngelCentralBank {
   uint public totalInvestors = 0;
   uint public totalTokensSold = 0;
 
-  bool angelTokenUnpaused = false;
+  bool isIcoFinished = false;
   bool firstRefundRoundFundsWithdrawal = false;
 
 
@@ -137,7 +137,7 @@ contract AngelCentralBank {
     if (totalTokensSold >= icoCap) {
       icoFinishTimestamp = now;
 
-      unpauseAngelToken();
+      finishIco();
     }
 
     // fire event
@@ -351,11 +351,11 @@ contract AngelCentralBank {
 
   /* Lifecycle */
 
-  function unpauseAngelToken() public {
+  function finishIco() public {
     require(now >= icoFinishTimestamp);
-    require(angelTokenUnpaused == false);
+    require(isIcoFinished == false);
 
-    angelTokenUnpaused = true;
+    isIcoFinished = true;
 
     angelToken.unpauseContract();
   }
