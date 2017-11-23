@@ -12,7 +12,16 @@ import './AngelCentralBank.sol';
  */
 contract AngelCentralBankTest is AngelCentralBank {
 
+  /* Storage - state */
+
+  address public angelAdminAddress;
+
+
   /* Constructor and config */
+
+  function AngelCentralBankTest() {
+    angelAdminAddress = msg.sender;
+  }
 
   function setICOConfig(
     address _newFoundationAddress,

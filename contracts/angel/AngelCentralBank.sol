@@ -48,7 +48,6 @@ contract AngelCentralBank {
 
   /* Storage - state */
 
-  address public angelAdminAddress;
   address public angelFoundationAddress = address(0x2b0556a6298eA3D35E90F1df32cc126b31F59770);
   uint public icoLaunchTimestamp = 1511784000;  // November 27th 12:00 GMT
   uint public icoFinishTimestamp = 1514376000;  // December 27th 12:00 GMT
@@ -76,8 +75,6 @@ contract AngelCentralBank {
   /* Constructor and config */
 
   function AngelCentralBank() {
-    angelAdminAddress = msg.sender;
-
     angelToken = new AngelToken();
     angelToken.enableManager(address(this));
     angelToken.grantManagerPermission(address(this), 'mint_tokens');
