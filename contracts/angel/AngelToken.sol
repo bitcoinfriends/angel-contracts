@@ -23,7 +23,7 @@ contract AngelToken is StandardToken, NamedToken, Pausable {
 
   /* Storage */
 
-  address public centralBankAddress;
+  address public centralBankAddress = 0x0;
   mapping (address => uint) spendingBlocksNumber;
 
 
