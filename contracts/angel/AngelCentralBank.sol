@@ -361,7 +361,6 @@ contract AngelCentralBank {
   }
 
   function withdrawFoundationFunds() external {
-    require(msg.sender == angelFoundationAddress || msg.sender == angelAdminAddress);
     require(now > firstRefundRoundFinishTimestamp);
 
     if (now > firstRefundRoundFinishTimestamp && now <= secondRefundRoundFinishTimestamp) {
