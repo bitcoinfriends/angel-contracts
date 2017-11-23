@@ -99,7 +99,7 @@ contract AngelCentralBank {
    * @dev Process new ETH investment and sends tokens back
    */
   function angelRaise() internal {
-    require(msg.value >= 0);
+    require(msg.value > 0);
     require(now >= icoLaunchTimestamp && now < icoFinishTimestamp);
 
     // calculate amount of tokens for received ETH
