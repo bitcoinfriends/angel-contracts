@@ -153,7 +153,7 @@ contract AngelCentralBank {
   function calculatePurchasedTokens(
     uint _totalTokensSoldBefore,
     uint _investedEthWei)
-    constant returns (uint _purchasedTokensWei, uint _notProcessedEthWei)
+    constant public returns (uint _purchasedTokensWei, uint _notProcessedEthWei)
   {
     _purchasedTokensWei = 0;
     _notProcessedEthWei = _investedEthWei;
@@ -196,7 +196,7 @@ contract AngelCentralBank {
     address _investor,
     uint _returnedTokensWei
   )
-    returns (uint)
+    external returns (uint)
   {
     require(msg.sender == address(angelToken));
     require(now >= icoLaunchTimestamp && now < secondRefundRoundFinishTimestamp);
@@ -275,7 +275,7 @@ contract AngelCentralBank {
   function calculateRefundedEthWithDiscount(
     uint _refundedEthWei
   )
-    constant returns (uint)
+    public constant returns (uint)
   {
     if (now <= firstRefundRoundFinishTimestamp) {
       return (_refundedEthWei * firstRefundRoundRateNumerator / firstRefundRoundRateDenominator);
@@ -295,7 +295,7 @@ contract AngelCentralBank {
     uint _totalTokensSoldBefore,
     uint _returnedTokensWei
   )
-    constant returns (uint _refundedEthWei, uint _notProcessedTokensWei)
+    public constant returns (uint _refundedEthWei, uint _notProcessedTokensWei)
   {
     _refundedEthWei = 0;
     uint _refundedTokensWei = 0;
@@ -342,7 +342,7 @@ contract AngelCentralBank {
    * @param _totalTokensSoldBefore uint Amount of tokens sold before [token wei]
    * @return Calculated price
    */
-  function calculateLandmarkPrice(uint _totalTokensSoldBefore) constant returns (uint) {
+  function calculateLandmarkPrice(uint _totalTokensSoldBefore) public constant returns (uint) {
     return initialTokenPrice + initialTokenPrice
                                * landmarkPriceStepNumerator / landmarkPriceStepDenominator
                                * (_totalTokensSoldBefore / landmarkSize);
@@ -351,7 +351,7 @@ contract AngelCentralBank {
 
   /* Lifecycle */
 
-  function unpauseAngelToken() {
+  function unpauseAngelToken() public {
     require(now >= icoFinishTimestamp);
     require(angelTokenUnpaused == false);
 
@@ -360,7 +360,7 @@ contract AngelCentralBank {
     angelToken.unpauseContract();
   }
 
-  function withdrawFoundationFunds() {
+  function withdrawFoundationFunds() external {
     require(msg.sender == angelFoundationAddress || msg.sender == angelAdminAddress);
     require(now > firstRefundRoundFinishTimestamp);
 

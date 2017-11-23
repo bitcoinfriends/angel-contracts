@@ -64,25 +64,25 @@ contract AngelToken is StandardToken, NamedToken, Pausable {
   }
 
 
-  function mint(address _account, uint _value) onlyAllowedManager('mint_tokens') {
+  function mint(address _account, uint _value) external onlyAllowedManager('mint_tokens') {
     balances[_account] = balances[_account].add(_value);
     totalSupply = totalSupply.add(_value);
     MintEvent(_account, _value);
     Transfer(address(0x0), _account, _value); // required for blockexplorers
   }
 
-  function burn(uint _value) onlyAllowedManager('burn_tokens') {
+  function burn(uint _value) external onlyAllowedManager('burn_tokens') {
     balances[msg.sender] = balances[msg.sender].sub(_value);
     totalSupply = totalSupply.sub(_value);
     BurnEvent(msg.sender, _value);
   }
 
-  function blockSpending(address _account) onlyAllowedManager('block_spending') {
+  function blockSpending(address _account) external onlyAllowedManager('block_spending') {
     spendingBlocksNumber[_account] = spendingBlocksNumber[_account].add(1);
     SpendingBlockedEvent(_account);
   }
 
-  function unblockSpending(address _account) onlyAllowedManager('unblock_spending') {
+  function unblockSpending(address _account) external onlyAllowedManager('unblock_spending') {
     spendingBlocksNumber[_account] = spendingBlocksNumber[_account].sub(1);
     SpendingUnblockedEvent(_account);
   }
