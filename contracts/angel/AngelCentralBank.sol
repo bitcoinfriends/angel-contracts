@@ -50,7 +50,7 @@ contract AngelCentralBank {
 
   address public angelFoundationAddress = address(0x2b0556a6298eA3D35E90F1df32cc126b31F59770);
   uint public icoLaunchTimestamp = 1511784000;  // November 27th 12:00 GMT
-  uint public icoFinishTimestamp = 1514376000;  // December 27th 12:00 GMT
+  uint public icoFinishTimestamp = 1513727999;  // December 19th 23:59:59 GMT
   uint public firstRefundRoundFinishTimestamp = 1520424000;  // March 7th 2018 12:00 GMT
   uint public secondRefundRoundFinishTimestamp = 1524744000;  // April 26th 2018 12:00 GMT
 
