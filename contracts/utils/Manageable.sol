@@ -1,7 +1,7 @@
 pragma solidity ^0.4.15;
 
 
-import "zeppelin-solidity/contracts/ownership/Ownable.sol";
+import "../zeppelin-solidity/Ownable.sol";
 
 
 /**
@@ -34,7 +34,7 @@ contract Manageable is Ownable {
    * @dev Function to add new manager
    * @param _manager address New manager
    */
-  function enableManager(address _manager) onlyOwner onlyValidAddress(_manager) {
+  function enableManager(address _manager) external onlyOwner onlyValidAddress(_manager) {
     require(managerEnabled[_manager] == false);
 
     managerEnabled[_manager] = true;
@@ -45,7 +45,7 @@ contract Manageable is Ownable {
    * @dev Function to remove existing manager
    * @param _manager address Existing manager
    */
-  function disableManager(address _manager) onlyOwner onlyValidAddress(_manager) {
+  function disableManager(address _manager) external onlyOwner onlyValidAddress(_manager) {
     require(managerEnabled[_manager] == true);
 
     managerEnabled[_manager] = false;
@@ -60,6 +60,7 @@ contract Manageable is Ownable {
   function grantManagerPermission(
     address _manager, string _permissionName
   )
+    external
     onlyOwner
     onlyValidAddress(_manager)
     onlyValidPermissionName(_permissionName)
@@ -78,6 +79,7 @@ contract Manageable is Ownable {
   function revokeManagerPermission(
     address _manager, string _permissionName
   )
+    external
     onlyOwner
     onlyValidAddress(_manager)
     onlyValidPermissionName(_permissionName)
@@ -96,7 +98,7 @@ contract Manageable is Ownable {
    * @param _manager address Manager`s address
    * @return True if manager is enabled
    */
-  function isManagerEnabled(address _manager) constant onlyValidAddress(_manager) returns (bool) {
+  function isManagerEnabled(address _manager) public constant onlyValidAddress(_manager) returns (bool) {
     return managerEnabled[_manager];
   }
 
@@ -109,6 +111,7 @@ contract Manageable is Ownable {
   function isPermissionGranted(
     address _manager, string _permissionName
   )
+    public
     constant
     onlyValidAddress(_manager)
     onlyValidPermissionName(_permissionName)
@@ -126,6 +129,7 @@ contract Manageable is Ownable {
   function isManagerAllowed(
     address _manager, string _permissionName
   )
+    public
     constant
     onlyValidAddress(_manager)
     onlyValidPermissionName(_permissionName)

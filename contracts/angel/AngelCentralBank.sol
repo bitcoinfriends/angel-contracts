@@ -1,7 +1,7 @@
 pragma solidity ^0.4.15;
 
 
-import 'zeppelin-solidity/contracts/math/SafeMath.sol';
+import '../zeppelin-solidity/SafeMath.sol';
 import './AngelToken.sol';
 
 
@@ -74,7 +74,7 @@ contract AngelCentralBank {
 
   /* Constructor and config */
 
-  function AngelCentralBank() {
+  function AngelCentralBank() public {
     angelToken = new AngelToken();
     angelToken.enableManager(address(this));
     angelToken.grantManagerPermission(address(this), 'mint_tokens');
@@ -88,7 +88,7 @@ contract AngelCentralBank {
   /**
    * @dev Fallback function receives ETH and sends tokens back
    */
-  function () payable {
+  function () public payable {
     angelRaise();
   }
 

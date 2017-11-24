@@ -1,7 +1,7 @@
 pragma solidity ^0.4.15;
 
 
-import "zeppelin-solidity/contracts/token/StandardToken.sol";
+import "../zeppelin-solidity/StandardToken.sol";
 import "../utils/Manageable.sol";
 import "../utils/Pausable.sol";
 import "../token/NamedToken.sol";
@@ -29,14 +29,14 @@ contract AngelToken is StandardToken, NamedToken, Pausable {
 
   /* Constructor */
 
-  function AngelToken() NamedToken('Angel Token', 'ANGL', 18) {
+  function AngelToken() public NamedToken('Angel Token', 'ANGL', 18) {
     centralBankAddress = msg.sender;
   }
 
 
   /* Methods */
 
-  function transfer(address _to, uint _value) returns (bool) {
+  function transfer(address _to, uint _value) public returns (bool) {
     if (_to != centralBankAddress) {
       require(!paused);
     }
@@ -49,11 +49,11 @@ contract AngelToken is StandardToken, NamedToken, Pausable {
     return result;
   }
 
-  function approve(address _spender, uint _value) whenContractNotPaused returns (bool){
+  function approve(address _spender, uint _value) public whenContractNotPaused returns (bool){
     return super.approve(_spender, _value);
   }
 
-  function transferFrom(address _from, address _to, uint _value) whenContractNotPaused returns (bool){
+  function transferFrom(address _from, address _to, uint _value) public whenContractNotPaused returns (bool){
     require(spendingBlocksNumber[_from] == 0);
 
     bool result = super.transferFrom(_from, _to, _value);

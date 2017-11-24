@@ -1,7 +1,7 @@
 pragma solidity ^0.4.15;
 
 
-import 'zeppelin-solidity/contracts/math/SafeMath.sol';
+import '../zeppelin-solidity/SafeMath.sol';
 import './AngelCentralBank.sol';
 
 
@@ -19,7 +19,7 @@ contract AngelCentralBankTest is AngelCentralBank {
 
   /* Constructor and config */
 
-  function AngelCentralBankTest() {
+  function AngelCentralBankTest() public {
     angelAdminAddress = msg.sender;
   }
 
